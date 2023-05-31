@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+
+  name:  {{ printf "%s-%s" .Chart.Name "ingress" | quote }}
+ 
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/inbound-cidrs: 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8
+    alb.ingress.kubernetes.io/subnets: subnet-0c02015de7dc8232c, subnet-0b355e06930ad626c
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.SSLcertificate }}
+    alb.ingress.kubernetes.io/tags: Environment={{ .Values.environment }},Application=petclinic,AppManagedBy=cceo,InfraManagedBy=ccoe
+    external-dns.alpha.kubernetes.io/hostname: {{.Values.ingress.domain}}
+    
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ printf "%s-%s" .Chart.Name "service" | quote }}
+              port:
+                number: 80

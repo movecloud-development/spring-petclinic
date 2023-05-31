@@ -1,0 +1,32 @@
+replicaCount: 2
+image:
+  repository: 750713712981.dkr.ecr.us-west-2.amazonaws.com/spring-petclinic
+  tag: pge-latest
+  pullPolicy: Always
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 400Mi
+service:
+  port: 80
+  targetPort: 8081
+stickySessions:
+  enabled: true
+  cookieName: "route"
+  cookieExpire: "172800"
+ingress:
+  enabled: true
+  domain: eksdemoa8.nonprod.pge.com
+  certIssuer: letsencrypt-prod
+  annotations: {}
+  hosts: []
+# Application values
+environment: prod
+SSLcertificate: arn:aws:acm:us-west-2:750713712981:certificate/bc02a7c0-fbae-46c8-b451-bda5a933a443
+accessLogs:
+  bucket: petclinic-prod-bucket-logs
+  prefix: petclinic-prod-alb
+
+
+

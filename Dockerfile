@@ -1,23 +1,10 @@
-ARG BASE_IMAGE_URL \
-    IMAGE_TYPE \
-    OWNER
-FROM $BASE_IMAGE_URL/java-runtime:pge-latest
-ARG ENVIRONMENT
-LABEL Environment=$ENVIRONMENT
-LABEL Image_Type=$IMAGE_TYPE
-LABEL Owner=$OWNER
-LABEL maintainer="Shoban Cheekuru<sycz@pge.com>"
+FROM maven:3.8.4-openjdk-17
 
-#FROM tekyantra-np-docker-virtual.jfrog.nonprod.pge.com/java:8-jre
-#FROM 514712703977.dkr.ecr.us-west-2.amazonaws.com/java-runtime
-#ARG BASE_IMAGE_URL
-#FROM $BASE_IMAGE_URL/java:8-jre
-#ARG ENVIRONMENT
-#LABEL Environment=$ENVIRONMENT
-#LABEL maintainer="Shoban Cheekuru<sycz@pge.com>"
+WORKDIR /usr/src/app
 
-RUN mkdir spring-petclinic
-COPY target/spring*.jar /spring-petclinic/spring-petclinic.jar
-EXPOSE 8081
+COPY . /usr/src/app
+RUN mvn package
 
-ENTRYPOINT ["java", "-jar", "/spring-petclinic/spring-petclinic.jar","--server.port=8081"]
+ENV PORT 5000
+EXPOSE $PORT
+CMD [ "sh", "-c", "mvn -Dspring-boot.run.arguments=--server.port=${PORT} spring-boot:run" ]
